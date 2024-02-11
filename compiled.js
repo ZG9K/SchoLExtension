@@ -10,10 +10,9 @@
 //     ___(.)<
 //     \____)
 // 
-
 // Regex to find subject codes inside a subject string e.g. "12 PHYSICS 01 (12SC-PHYSI01)" -> "12SC-PHYSI01"
 // Regex2 to find subject codes inside a subject string e.g. "12 PHYSICS 01 [12SC-PHYSI01]" -> "12SC-PHYSI01"
-//lets say this was a meaningful change
+
 const REGEXP = /\(([^)]+)\)/;
 const REGEXP2 = /\[([^)]+)\]/;
 // Timetable rows NOT to remove if all blank
@@ -32,7 +31,7 @@ const VALID_PRONOUNS = {"hehim" : "He/Him", "sheher": "She/Her", "theythem": "Th
 const IMAGE_TYPES = ['image/png', 'image/gif', 'image/bmp', 'image/jpeg'];
 // Darkmode Core location
 const CORE_CSS_URL = "https://services.stmichaels.vic.edu.au/_dmode/darkmode.css";
-// Darkmode Theme Location
+// Darkmode Theme Json Location
 const THEMES_CSS_URL = "https://api.onedrive.com/v1.0/shares/s!Ai0PkvhmurwZge_4fiSBxkmJaiRsF_I/root/content"
 
 const DEFAULT_CONFIG = {
@@ -77,6 +76,7 @@ function getRgbContrast(rgb1, rgb2) {
 // Dark Mode ------------------------------------------------------
 let coreCSSDom;
 let themeCSSDom;
+let themeApplied = false;
 
 function loadTheme(theme, mode) {
     darkMode = mode
@@ -98,27 +98,26 @@ function loadTheme(theme, mode) {
         return;
     }
 
-    //Applies the core theme
-    coreCSSDom = document.createElement('link');
-    coreCSSDom.rel = "stylesheet";
-    coreCSSDom.href = CORE_CSS_URL;
-    document.styleSheets[1] && (document.styleSheets[1].disabled = false);
-    coreCSSDom.id = "darkmode-core";
-    (document.head || document.body).appendChild(coreCSSDom);
+//Applies the theme data and core files
+fetch(THEMES_CSS_URL)
+    .then(response => response.json())
+    .then(themesJson => {
 
-    //Applies the theme on top of the page
-    fetch(THEMES_CSS_URL)
-        .then(response => response.json())
-        .then(themesJson => {
+        //Applies the core theme
+        const coreCSSDom = document.createElement('link');
+        coreCSSDom.rel = "stylesheet";
+        coreCSSDom.href = CORE_CSS_URL;
+        coreCSSDom.id = "darkmode-core";
+        (document.head || document.body).appendChild(coreCSSDom);
+
+        //Applies the theme
         const themeData = themesJson["themes"][mode][theme];
         const themeCSSDom = document.createElement('style');
         themeCSSDom.textContent = themeData;
-        if (document.styleSheets[1]) {
-        document.styleSheets[1].disabled = false;
-        }
         themeCSSDom.id = "darkmode-theme";
         (document.head || document.body).appendChild(themeCSSDom);
-    });
+        themeApplied = true;
+});
 }
 
 //this function does the contrast stuff and isnt called at all, so just... yeah
@@ -444,7 +443,7 @@ async function allPages() {
         localStorage.setItem("extConfig", JSON.stringify(extConfig));
         await postConfig();
     }
-    loadTheme(extConfig.darkmodeTheme, extConfig.darkmodeMode);
+    if(themeApplied==true){loadTheme(extConfig.darkmodeTheme, extConfig.darkmodeMode);}
     
     colourSidebar();
     colourTimetable();
@@ -1275,7 +1274,11 @@ async function mainPage() {
                 </li>
             `
         }
-        document.getElementById("ptvDepartures").innerHTML = `<ul class="information-list">${departureHTML}</ul>`
+        const ptvDeparturesElement = document.getElementById("ptvDepartures");
+        if (ptvDeparturesElement) {
+            // IT people removed this from the schol homepage so i added this to prevent an error every time
+            ptvDeparturesElement.innerHTML = `<ul class="information-list">${departureHTML}</ul>`;
+        }
         ptvUpdating = false;
     }
     window.addEventListener("focus", function (e) { PTVDepatureUpdate = true}, false);
@@ -1407,6 +1410,7 @@ async function postConfig() {
 }
 
 if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL == "undefined")) {
+
     let splashList = [
         "Ducks are pretty cool",
         "Custom themes one day???",
@@ -1417,7 +1421,7 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         ":D",
         "Hello there",
         "General kenobi",
-        "Over 1.8k lines of code!",
+        "Over 1.5k lines of code!",
         "We would like to contact your about your car's extended warranty",
         "As seen on TV!",
         "Déjà vu!",
@@ -1428,13 +1432,13 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         "NP is not in P!",
         "Jeb_",
         "Also try services!",
-        "There are no facts, only interpretations.",
+        "There are no facts, only interpretations!",
         "Made with CSS!",
         "Made with JS!",
         "0% Sugar!",
         "The future is now!",
         "Schol+ >>>",
-        "bea was here",
+        "bea was here!",
         "2024 exclusive!",
         "Now with themes!",
         "All I want for christmas is for you to wash your dishes",
@@ -1455,7 +1459,7 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         "Ghoughpteighbteau tchoghs!",
         "Bring me a shrubbery.",
         "Dragon free!",
-        "Probably follows ventilation guidelines.",
+        "Follows ventilation guidelines!",
         "Breen should win the house cup!",
         "Hughes should win the house cup!",
         "Mitre should win the house cup!",
@@ -1465,16 +1469,15 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         "Meeting expectations!",
         "Usually!",
         "2345312!",
-        "The cake is a lie.",
-        "I'll show you how deep the rabbit hole goes.",
+        "The cake is a lie!",
+        "I'll show you how deep the rabbit hole goes!",
         "duckawesome is not a cheat code!",
         "Ctrl+Alt+Del your worries away!",
         "Error 404: Splash not found!",
         "Error 418: I'm a teapot!",
-        "Error 503: Out of coffee!",
         "Reality.exe has stopped working!",
         "Glitch in the matrix detected!",
-        "Only 50p!",
+        "Only 50c!",
         "It's not a bug, it's a feature!",
         "This splash text is a lie!",
         "Ctrl+S to save this splash!",
@@ -1486,36 +1489,43 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         "Use W to walk!",
         "Debugging... or maybe just bugging...",
         "Still trying to find Wally!",
-        "Reality is just a crutch for people who can't handle video games.",
+        "Reality is just a crutch for people who can't handle video games!",
         "A wild splash appeared!",
         "To infinity and beyond!",
-        "That's what she said",
+        "That's what she said!",
         "Have you turned it on and off again?",
         "Keep your enemies close and your... wait",
         "I'm on a boat!",
-        "Works at Sea (probably!)",
-        "Who lives in the console under the sea (me. i do.)",
+        "Works at Sea (probably)!",
+        "Who lives in the console under the sea? Me!",
         "Its me, Hi, I'm SchoLExtention, its me!",
         "This is not a drill!",
         "This is a drill!",
-        "I solemly swear I am up to no good",
-        "That's what she coded",
+        "I solemly swear I am up to no good!",
+        "That's what she coded!",
         "Houston we have a problem!",
-        "Do you want to know the odds of seeing this message? 1/" + splashList.length
+        "Colourmatic!"
     ];
-    
+
     if (window.chrome && chrome.runtime && chrome.runtime.id) {
         splashList = [
             "Development Enabled"
         ]
     }
 
-    const splashIndex = Math.floor(Math.random() * splashList.length);
-    const splashText = splashList[splashIndex];
-    if(splashText == "Did you spot it?"){
-        console.log("SchoL Extentions Loaded. " + splashText);
-    }else{
-    console.log("SchoL Extensions Loaded. " + splashText);
-    }
+    splashIndex = Math.floor(Math.random() * splashList.length);
+    //splashIndex = splashList.length -1
+    const splashText = "\n" + splashList[splashIndex];
+
+    switch (splashText) {
+        case "\nDid you spot it?":
+          console.log("SchoL Extentions Loaded. " + "%c" + splashText, "color: #fcfc74");
+          break;
+        case "\nColourmatic!":
+          console.log("SchoL Extensions Loaded. " + "\n%cC%co%cl%co%cu%cr%cm%ca%ct%ci%cc!", "color: #c73c3c", "color: #c7663c", "color: #d9bc55", "color: #8fc74c", "color: #4cc78e", "color: #4cc7a2", "color: #5e4cc7", "color: #854cc7", "color: #aa4cc7", "color: #c74cbb", "color: #c74c8a");
+          break;
+        default:
+          console.log("SchoL Extensions Loaded. " + "%c" + splashText, "color: #fcfc74");
+      }
 
 }
