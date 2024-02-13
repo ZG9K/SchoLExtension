@@ -12,7 +12,6 @@
 // 
 // Regex to find subject codes inside a subject string e.g. "12 PHYSICS 01 (12SC-PHYSI01)" -> "12SC-PHYSI01"
 // Regex2 to find subject codes inside a subject string e.g. "12 PHYSICS 01 [12SC-PHYSI01]" -> "12SC-PHYSI01"
-
 const REGEXP = /\(([^)]+)\)/;
 const REGEXP2 = /\[([^)]+)\]/;
 // Timetable rows NOT to remove if all blank
@@ -710,7 +709,7 @@ async function loadSettings() {
         </table>`
 
         module_Themes = `  
-        <h2 class="subheader">Custom Themes</h2>
+        <h2 class="subheader">Custom Themessss</h2>
         <section>
             <fieldset class="content">
                 <legend><strong>Colour Theme Selector</strong></legend>
@@ -724,8 +723,10 @@ async function loadSettings() {
                 <p>And select the mode here!<br></p>
                 </div>
                 <div class="small-12 columns" style="margin-top:10px;"><select id="context-selector-dark">${darkOptions}</select>
-                <p class="meta">'System Defaults' uses your system theme setting, while light and dark mode override that setting for your preference.</p></div>
+                <p class="meta">'System Defaults' uses your system theme setting, while light and dark mode override that setting for your preference.</p>
+                </div>
             </fieldset>
+            
             
             <fieldset class="content">
             <div class="small-12 columns">
@@ -758,6 +759,7 @@ async function loadSettings() {
     injectModule(module_Themes)
     injectModule(module_Timetable)
     injectModule(module_Credits)
+
 
     // When the page loads, add an event listener to the dakr mode selector.
     document.querySelector("#context-selector-dark").value = extConfig.darkmodeMode;
@@ -1536,4 +1538,8 @@ if (!(localStorage.getItem("disableQOL") != undefined && typeof forceEnableQOL =
         default:
           console.log(devSplash + "SchoL Extensions Loaded. " + "%c" + splashText, "color: #fcfc74");
     }
+    document.addEventListener("DOMContentLoaded", function() {
+        if(window.scholChromeExt){
+        document.getElementById("side-menu").insertAdjacentHTML("afterbegin", `<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUXbmV2ZXIgZ29ubmEgZ2l2ZSB5b3UgdXA%3D" class="splash">ScholEXT Dev Enabled! <br>` +  splashText + `</a>`);
+    }});
 }
