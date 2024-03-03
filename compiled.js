@@ -36,7 +36,8 @@ const THEMES_CSS_URL = "https://api.onedrive.com/v1.0/shares/s!Ai0PkvhmurwZge_4f
 const DEFAULT_CONFIG = {
     "theme" : {},
     "themedefault" : {},
-    "darkmodetheme" : "light",
+    "darkmodeMode" : "light",
+    "darkmodeTheme" : "original",
     "settings" : {"colourduework":1,"compacttimetable":1},
     "pronouns" : {"selected":[],"show":[1,1,1]},
     "updated" : 0,
@@ -521,7 +522,7 @@ function profilePage() {
         let pronouns = r.join(", ")
         const profileRow = document.querySelector(".main .profile.content .row");
         profileRow.style.position = "relative";
-        profileRow.insertAdjacentHTML("beforeend", `<span class="neutral label hide-for-small-down" style="position: absolute; top: 0; right: 0; margin: 0${!pronouns.length ? "; display: none !important" : ""}" id="pronounslabel">Pronouns: ${pronouns}</span>`)
+        profileRow.insertAdjacentHTML("beforeend", `<span class="neutral label hide-for-small-down" style="position: absolute; top: 0; right: 0; margin: 0${!pronouns.length ? "; display: none !important" : ""}" id="pronounslabel">Pronouns: ${pronouns}  <img src="https://www.health.com/thmb/ti-t_39bnGXLyWgyEX4V4yJfU9Y=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/intersex-progress-pride-fb46a844b53b4310b318370135239484.png" height=18px width=18px></span>`)
         profileRow.children[1].insertAdjacentHTML("beforeend", `<dl class="hide-for-medium-up" ${!pronouns.length ? "style='display: none !important'" : ""}><dt class="small-4 medium-3 columns">Pronouns:</dt><dd class="small-8 medium-9 columns" id="pronounsrow">${pronouns}</dd></dl>`)
     })
 }
@@ -593,14 +594,33 @@ async function loadSettings() {
         }
     }
 
-    const settings = {
+    const timetableSettings = {
         "colourduework": ["Coloured Due Work", "Add colours to due work items based on the timetable"],
         "compacttimetable": ["Compact Timetable", "Remove empty items/rows from the timetable on the dashboard and timetable page"]
     }
-    let settingselems = ""
-    for (const setting in settings) {
-        settingselems += `<tr>
-            <td style="border-bottom: 0px !important"><label for="toggle_${setting}">${settings[setting][0]}<p>${settings[setting][1]}</p></label></td>
+    let timetableSetElems = ""
+    for (const setting in timetableSettings) {
+        timetableSetElems += `<tr>
+            <td style="border-bottom: 0px !important"><label for="toggle_${setting}">${timetableSettings[setting][0]}<p>${timetableSettings[setting][1]}</p></label></td>
+            <td style="border-bottom: 0px !important">
+                <div class="long switch no-margin" style="float: right">
+                    <input id="toggle_${setting}" type="checkbox" name="toggle_${setting}" value="1" checked>
+                    <label for="toggle_${setting}">
+                        <span>Enabled</span>
+                        <span>Disabled</span>
+                    </label>
+                </div>
+            </td>
+        </tr>`
+    }
+
+    const pronounSettings = {
+        "prideflag": ["Pride Flag", "Add a Pride flag next to the pronouns on your profile!"],
+    }
+    let pronounSetElems = ""
+    for (const setting in pronounSettings) {
+        pronounSetElems += `<tr>
+            <td style="border-bottom: 0px !important"><label for="toggle_${setting}">${pronounSettings[setting][0]}<p>${pronounSettings[setting][1]}</p></label></td>
             <td style="border-bottom: 0px !important">
                 <div class="long switch no-margin" style="float: right">
                     <input id="toggle_${setting}" type="checkbox" name="toggle_${setting}" value="1" checked>
@@ -663,6 +683,12 @@ async function loadSettings() {
                 <p class="meta"><strong>Note: </strong>To make official changes of names to a student's records, there is a process that parents need to follow by contacting the Head of the School.</p>
             </div>
         </fieldset>
+        <fieldset class="content">
+        <legend><strong>Other Settings</strong></legend>
+        <div class="small-12 columns">
+            <table class="no-margin"><tbody>${pronounSetElems}</tbody></table>
+        </div>
+    </fieldset>
     </section>`
 
     module_Timetable = `
@@ -687,7 +713,7 @@ async function loadSettings() {
                 <fieldset class="content">
                     <legend><strong>Settings</strong></legend>
                     <div class="small-12 columns">
-                        <table class="no-margin"><tbody>${settingselems}</tbody></table>
+                        <table class="no-margin"><tbody>${timetableSetElems}</tbody></table>
                     </div>
                 </fieldset>
                 <div class="component-action">
@@ -739,7 +765,18 @@ async function loadSettings() {
     module_Credits = `
     <div class="component-action" style="margin-top: 20px; margin-bottom: 20px;">
         <span style="font-size: 12px; color: #AAA;">
-            Additional features developed by Yuma (M2024), Sebastien (H2023), Max (S2024), and Zac (H2022).
+            Additional features developed by Yuma (M2024), Sebastien (H2023), Max (S2024), and Zac (H2022)...
+        </span>
+    </div>
+
+    <ul class="meta" style="font-size: 12px">
+        SchoL features and profile settings are managed by the School Leadership Team and the St Michael's ICT Steering Committee. Feedback and future suggestions for the improvement of SchoL can be directed to: <a href="mailto:scholfeedback@stmichaels.vic.edu.au">scholfeedback@stmichaels.vic.edu.au</a>. <!-- rip dead name remover :( -->
+    </ul>`
+
+    module_Demo = `
+    <div class="component-action" style="margin-top: 20px; margin-bottom: 20px;">
+        <span style="font-size: 12px; color: #AAA;">
+            penis haha funny
         </span>
     </div>
 
